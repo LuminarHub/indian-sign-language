@@ -878,7 +878,7 @@ def add_audio(request):
             data = Registration.objects.get(Email=request.session['Email'])
             data.audio=audio_file
             data.save()
-            messages.success(request, 'Address added successfully!')
+            messages.success(request, 'Audio added successfully!')
             return redirect('Home')
         except Exception as e:
             print("Error:", str(e))
@@ -889,3 +889,60 @@ def add_audio(request):
     
 class MainHomeView(TemplateView):
     template_name = "mainhome.html"
+    
+    
+    
+class TextToVoiceView(TemplateView):
+    template_name = "text-to-voice.html"
+    
+    
+    
+    
+import os
+import torch
+from django.http import JsonResponse, FileResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import default_storage
+from TTS.api import TTS
+from django.contrib.auth.models import User
+
+
+def clone_voice(reference_audio_path, text_to_clone, output_path):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    
+    # Initialize TTS with the voice cloning model
+    tts = TTS(model_name="tts_models/multilingual/multi-dataset/your_tts",
+              progress_bar=True,
+              gpu=torch.cuda.is_available())
+    
+    # Clone voice and generate speech
+    tts.tts_to_file(text=text_to_clone,
+                    file_path=output_path,
+                    speaker_wav=reference_audio_path,
+                    language="en")
+    
+    return output_path
+
+@csrf_exempt
+def voice_clone_view(request):
+    if request.method == 'POST':
+        if 'text_to_clone' not in request.POST :
+            return JsonResponse({'error': 'Missing required parameters'}, status=400)
+        text_to_clone = request.POST['text_to_clone']
+        user_id = request.session['Email']
+        try:
+            user = Registration.objects.get(Email=user_id)
+            reference_audio_path = user.audio.path 
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except AttributeError:
+            return JsonResponse({'error': 'User does not have a voice recording'}, status=400)
+        
+        output_path = os.path.join("media/output", f"cloned_voice_{user_id}.wav")
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        try:
+            output_file = clone_voice(reference_audio_path, text_to_clone, output_path)
+            return FileResponse(open(output_file, 'rb'), content_type='audio/wav', as_attachment=True, filename=f"cloned_voice_{user_id}.wav")
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'message': 'Use POST request to clone voice'})

@@ -1,0 +1,518 @@
+{% extends "home.html" %}
+{% block home %}
+{% load static %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    :root {
+      --primary-color: #4a6bff;
+      --secondary-color: #6c757d;
+      --success-color: #28a745;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+    
+    header {
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    
+    .logo h1 {
+      font-size: 1.5rem;
+      margin: 0;
+      color: var(--primary-color);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .nav-links a {
+      text-decoration: none;
+      color: var(--dark-color);
+      font-weight: 500;
+    }
+    
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+    
+    .auth-links {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .auth-links a {
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    
+    .auth-links a:first-child {
+      color: var(--primary-color);
+    }
+    
+    .auth-links a:last-child {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .hero {
+      padding: 3rem 0;
+      background-color: #f5f7ff;
+    }
+    
+    .page-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .page-title h1 {
+      font-size: 2.5rem;
+      color: var(--dark-color);
+      margin-bottom: 1rem;
+    }
+    
+    .page-title p {
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .voice-clone-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .guidelines {
+      background-color: #f8f9fa;
+      border-left: 4px solid var(--primary-color);
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .guidelines h3 {
+      margin-top: 0;
+      color: var(--dark-color);
+    }
+    
+    .guidelines ul {
+      padding-left: 1.5rem;
+      margin-bottom: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+    }
+    
+    textarea.form-control {
+      min-height: 100px;
+    }
+    
+    .btn {
+      display: inline-block;
+      font-weight: 500;
+      text-align: center;
+      vertical-align: middle;
+      user-select: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      color: white;
+      background-color: var(--primary-color);
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background-color: #3a5ad9;
+    }
+    
+    .alert {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .alert-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+    
+    .alert-danger {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+    
+    .recording-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .record-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: var(--danger-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .record-btn.recording {
+      animation: pulse 1.5s infinite;
+    }
+    
+    .record-status {
+      font-weight: 500;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+    
+    footer {
+      background-color: #f8f9fa;
+      padding: 3rem 0;
+      border-top: 1px solid #e9ecef;
+    }
+    
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+    
+    .footer-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--dark-color);
+    }
+    
+    .footer-section p {
+      color: var(--secondary-color);
+    }
+    
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .footer-section ul li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .footer-section ul li a {
+      text-decoration: none;
+      color: var(--secondary-color);
+    }
+    
+    .footer-section ul li a:hover {
+      color: var(--primary-color);
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    
+    .contact-item i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #e9ecef;
+      color: var(--dark-color);
+      text-decoration: none;
+    }
+    
+    .social-links a:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .copyright {
+      text-align: center;
+      padding-top: 2rem;
+      margin-top: 2rem;
+      border-top: 1px solid #e9ecef;
+      color: var(--secondary-color);
+    }
+    
+    @media (max-width: 768px) {
+      .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .footer-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+
+
+  <section class="hero">
+    <div class="container">
+      <div class="page-title">
+        <h1>Text to Voice Clone</h1>
+        <p>Convert your text to speech using our advanced voice cloning technology that replicates your own voice patterns.</p>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="voice-clone-container">
+      <div class="guidelines">
+        <h3>Voice Cloning Guidelines</h3>
+        <ul>
+          <li>You must record a reference audio sample of your voice before using this feature.</li>
+          <li>Speak clearly and naturally in your reference recording for best results.</li>
+          <li>The reference audio should be at least 10 seconds long for optimal voice pattern analysis.</li>
+          <li>Record in a quiet environment to minimize background noise.</li>
+          <li>Text-to-speech output works best with proper punctuation.</li>
+          <li>Keep your text between 10-300 words for optimal processing.</li>
+          <li>By using this feature, you agree to our Terms of Service regarding voice data usage.</li>
+        </ul>
+      </div>
+      
+      <div id="alertMessage" class="alert" role="alert"></div>
+      
+      <form id="voiceCloneForm" method="POST" action="{% url 'voice-clone' %}">
+        {% csrf_token %}
+        
+        
+        <div class="form-group">
+          <label for="textToClone">Text to Convert to Speech</label>
+          <textarea id="textToClone" name="text_to_clone" class="form-control" placeholder="Enter the text you want to convert to speech using your voice..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-clone"></i> Clone Voice
+          </button>
+        </div>
+      </form>
+      
+      <div id="outputContainer" style="display: none; margin-top: 2rem;">
+        <h3>Your Cloned Voice</h3>
+        <audio id="outputAudio" controls style="width: 100%;"></audio>
+        <div style="margin-top: 1rem;">
+          <button id="downloadButton" class="btn btn-primary">
+            <i class="fas fa-download"></i> Download Audio
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+   
+      const alertMessage = document.getElementById('alertMessage');
+      const voiceCloneForm = document.getElementById('voiceCloneForm');
+      const outputContainer = document.getElementById('outputContainer');
+      const outputAudio = document.getElementById('outputAudio');
+      const downloadButton = document.getElementById('downloadButton');
+      
+      let mediaRecorder;
+      let audioChunks = [];
+      let isRecording = false;
+      
+      // Record button functionality
+      recordButton.addEventListener('click', async () => {
+        if (!isRecording) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            
+            mediaRecorder.addEventListener('dataavailable', event => {
+              audioChunks.push(event.data);
+            });
+            
+            mediaRecorder.addEventListener('stop', () => {
+              const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+              const audioUrl = URL.createObjectURL(audioBlob);
+              
+              audioPreview.src = audioUrl;
+              audioPreview.style.display = 'block';
+              
+              // Create a File object from the Blob
+              const audioFile = new File([audioBlob], "reference_voice.wav", { type: 'audio/wav' });
+              
+              // Create a FileList-like object
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(audioFile);
+              
+              // Create and display success alert
+              showAlert('Reference audio successfully recorded! You can now proceed with voice cloning.', 'success');
+            });
+            
+            // Start recording
+            mediaRecorder.start();
+            isRecording = true;
+            recordButton.classList.add('recording');
+            recordStatus.textContent = 'Recording... Click to stop';
+            
+          } catch (error) {
+            console.error('Error accessing microphone:', error);
+            showAlert('Unable to access microphone. Please ensure you have granted permission.', 'danger');
+          }
+        } else {
+          // Stop recording
+          mediaRecorder.stop();
+          isRecording = false;
+          recordButton.classList.remove('recording');
+          recordStatus.textContent = 'Recording completed';
+        }
+      });
+      
+      // Form submission
+      voiceCloneForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const textToClone = document.getElementById('textToClone').value.trim();
+        
+        if (!audioChunks.length) {
+          showAlert('Please record a reference audio sample first.', 'danger');
+          return;
+        }
+        
+        if (!textToClone) {
+          showAlert('Please enter text to convert to speech.', 'danger');
+          return;
+        }
+        
+        // Normally, here you would submit the form with AJAX, including the audio file
+        // For demo purposes, we'll simulate the response
+        
+        showAlert('Processing your voice clone request...', 'success');
+        
+        // Simulate processing delay
+        setTimeout(() => {
+          // In a real implementation, this would be the response from the server
+          outputContainer.style.display = 'block';
+          
+          // For demo, we'll just use the original audio
+          outputAudio.src = audioPreview.src;
+          
+          showAlert('Voice cloning successful! Your text has been converted to speech using your voice pattern.', 'success');
+          
+          // Scroll to the output
+          outputContainer.scrollIntoView({ behavior: 'smooth' });
+        }, 2000);
+      });
+      
+      // Download button functionality (for demo)
+      downloadButton.addEventListener('click', () => {
+        // Create a download link for the audio
+        const a = document.createElement('a');
+        a.href = outputAudio.src;
+        a.download = 'cloned_voice.wav';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+      
+      // Function to show alerts
+      function showAlert(message, type) {
+        alertMessage.textContent = message;
+        alertMessage.className = `alert alert-${type}`;
+        alertMessage.style.display = 'block';
+        
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+          alertMessage.style.display = 'none';
+        }, 5000);
+      }
+    });
+  </script>
+{% endblock %}

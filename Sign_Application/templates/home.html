@@ -33,11 +33,12 @@
                         <a class="nav-link" href="{% url 'Home' %}">Home</a>
                     </li>
                     
-                    {% comment %} <li class="nav-item">
-                        <a class="nav-link" href="{% url 'text_to_sign' %}">Text to Sign</a>
-                    </li> {% endcomment %}
+                 
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'video' %}">Find the Sign</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'text-voice' %}">Text To Voice</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'learn' %}">Learn</a>
@@ -50,6 +51,7 @@
         </div>
     </nav>
     {% block home %}
+
     <!-- Hero Section -->
     <section class="hero-section text-center">
         <div class="container">
@@ -163,7 +165,21 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+        {% if messages %}
+        {% for message in messages %}
+          Swal.fire({
+            title: '{{ message }}',
+            icon: '{% if message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% else %}success{% endif %}',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+          });
+        {% endfor %}
+      {% endif %}
         document.addEventListener('DOMContentLoaded', function() {
             // Audio recording logic (keeping your existing code)
             const toggleRecordingBtn = document.getElementById('toggleRecording');

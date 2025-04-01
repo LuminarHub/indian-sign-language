@@ -26,5 +26,8 @@ urlpatterns=[
     path('get_latest_data/', views.get_latest_data, name='get_latest_data'),
     path('add_audio/', views.add_audio, name='add_audio'),
     path('command/', views.handle_command, name='command'),
+    path('text-to-voice/', views.TextToVoiceView.as_view(), name='text-voice'),
+    path('voice-clone/', views.voice_clone_view, name='voice-clone'),
+
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

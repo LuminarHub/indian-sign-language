@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo.png' %}">
+
+    <title>Mute </title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'Home' %}">
+                <i class="fas fa-sign-language me-2"></i>
+                Mute 
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'Home' %}">Home</a>
+                    </li>
+                    
+                    {% comment %} <li class="nav-item">
+                        <a class="nav-link" href="{% url 'text_to_sign' %}">Text to Sign</a>
+                    </li> {% endcomment %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'video' %}">Find the Sign</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'learn' %}">Learn</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'Logout_fn' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% block home %}
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="hero-title animate-fade-in">Discover. Learn. Connect.</h1>
+            <p class="hero-subtitle animate-fade-in">Master  Sign Language through interactive learning</p>
+            <form action="{% url 'show_images' %}" method="post" enctype="multipart/form-data" class="mt-5">
+                {% csrf_token %}
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="input-group " style="margin-left:30%;">
+                            <button type="button" class="btn btn-block   btn-custom" data-bs-toggle="modal" data-bs-target="#audioUploadModal">
+                        <i class="fas fa-microphone me-2"></i>Upload Audio
+                    </button>
+                        </div>
+                       
+                        
+                    </div>
+                    
+                </div>
+                
+            </form>
+        </div>
+        <audio controls class="mt-5 " style="width:75%;" >
+            <source src="{{ audio }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio> 
+    </section>
+    <!-- Audio Upload Modal -->
+<div class="modal fade" id="audioUploadModal" tabindex="-1" aria-labelledby="audioUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="audioUploadModalLabel">Upload Audio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Voice Status Questions -->
+                <div class="mb-4 p-3 bg-light rounded">
+                    <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Voice Information</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Are you mute by birth or did you lose your voice later in life?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="voiceStatus" id="muteLater" value="later">
+                            <label class="form-check-label" for="muteLater">
+                                Mute by birth
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="voiceStatus" id="muteByBirth" value="byBirth">
+                            <label class="form-check-label" for="muteByBirth">
+                                Lost voice later in life
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="genderSection" class="mb-3 d-none">
+                        <label class="form-label">Please select your gender:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" id="genderMale" value="male">
+                            <label class="form-check-label" for="genderMale">
+                                Male
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="female">
+                            <label class="form-check-label" for="genderFemale">
+                                Female
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="audioSourceNote" class="alert alert-info d-none">
+                        <!-- This will be populated dynamically based on selections -->
+                    </div>
+                </div>
+
+                <form action="{% url 'add_audio'  %}" method="post" enctype="multipart/form-data" id="audioUploadForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="audioFile" class="form-label">Select Audio File</label>
+                        <input type="file" class="form-control" id="audioFile" name="audio" accept="audio/*" required>
+                        <div class="form-text">Supported formats: MP3, WAV, M4A (Max size: 10MB)</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label class="form-label mb-0">Or Record Audio</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="toggleRecording">
+                                <i class="fas fa-microphone"></i> Start Recording
+                            </button>
+                        </div>
+                        <div id="recordingStatus" class="d-none">
+                            <div class="d-flex align-items-center mt-2">
+                                <div class="recording-indicator me-2"></div>
+                                <span id="recordingTime">00:00</span>
+                            </div>
+                        </div>
+                        <audio id="audioPreview" controls class="w-100 mt-2 d-none"></audio>
+                        <input type="hidden" id="recordedAudioBlob" name="recorded_audio">
+                        <input type="hidden" id="voiceStatusInput" name="voice_status">
+                        <input type="hidden" id="genderInput" name="gender">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Audio recording logic (keeping your existing code)
+            const toggleRecordingBtn = document.getElementById('toggleRecording');
+            const recordingStatus = document.getElementById('recordingStatus');
+            const recordingTime = document.getElementById('recordingTime');
+            const audioPreview = document.getElementById('audioPreview');
+            const recordedAudioInput = document.getElementById('recordedAudioBlob');
+            
+            let mediaRecorder;
+            let audioChunks = [];
+            let startTime;
+            let timerInterval;
+            let isRecording = false;
+            
+            toggleRecordingBtn.addEventListener('click', function() {
+                if (isRecording) {
+                    stopRecording();
+                } else {
+                    startRecording();
+                }
+            });
+            
+            function startRecording() {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        mediaRecorder = new MediaRecorder(stream);
+                        audioChunks = [];
+                        
+                        mediaRecorder.ondataavailable = e => {
+                            audioChunks.push(e.data);
+                        };
+                        
+                        mediaRecorder.onstop = () => {
+                            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            audioPreview.src = audioUrl;
+                            audioPreview.classList.remove('d-none');
+                            
+                            // Convert Blob to Base64 for form submission
+                            const reader = new FileReader();
+                            reader.readAsDataURL(audioBlob);
+                            reader.onloadend = () => {
+                                recordedAudioInput.value = reader.result.split(',')[1]; // Remove the data URL prefix
+                            };
+                        };
+                        
+                        mediaRecorder.start();
+                        isRecording = true;
+                        recordingStatus.classList.remove('d-none');
+                        toggleRecordingBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Recording';
+                        
+                        // Start timer
+                        startTime = Date.now();
+                        timerInterval = setInterval(updateRecordingTime, 1000);
+                    })
+                    .catch(error => {
+                        console.error('Error accessing microphone:', error);
+                        alert('Could not access microphone. Please check your browser permissions.');
+                    });
+            }
+            
+            function stopRecording() {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                clearInterval(timerInterval);
+                toggleRecordingBtn.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
+            }
+            
+            function updateRecordingTime() {
+                const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+                const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+                recordingTime.textContent = `${minutes}:${seconds}`;
+            }
+            
+            // New code for voice status and gender questions
+            const voiceStatusRadios = document.querySelectorAll('input[name="voiceStatus"]');
+            const genderRadios = document.querySelectorAll('input[name="gender"]');
+            const genderSection = document.getElementById('genderSection');
+            const audioSourceNote = document.getElementById('audioSourceNote');
+            const voiceStatusInput = document.getElementById('voiceStatusInput');
+            const genderInput = document.getElementById('genderInput');
+            const audioUploadForm = document.getElementById('audioUploadForm');
+            
+            // Listen for changes on voice status radios
+            voiceStatusRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    voiceStatusInput.value = this.value;
+                    
+                    if (this.value === 'byBirth') {
+                        // If mute by birth
+                        genderSection.classList.add('d-none');
+                        audioSourceNote.innerHTML = '<strong>Note:</strong> Please upload your own audio recording.';
+                        audioSourceNote.classList.remove('d-none');
+                    } else if (this.value === 'later') {
+                        // If lost voice later in life
+                        genderSection.classList.remove('d-none');
+                        updateAudioSourceNote();
+                    }
+                });
+            });
+            
+            // Listen for changes on gender radios
+            genderRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    genderInput.value = this.value;
+                    updateAudioSourceNote();
+                });
+            });
+            
+            function updateAudioSourceNote() {
+                const selectedGender = document.querySelector('input[name="gender"]:checked');
+                
+                if (selectedGender) {
+                    if (selectedGender.value === 'male') {
+                        audioSourceNote.innerHTML = '<strong>Note:</strong> Please upload your father\'s voice recording.';
+                    } else if (selectedGender.value === 'female') {
+                        audioSourceNote.innerHTML = '<strong>Note:</strong> Please upload your mother\'s voice recording.';
+                    }
+                    audioSourceNote.classList.remove('d-none');
+                }
+            }
+            
+            // Form submission
+            audioUploadForm.addEventListener('submit', function(e) {
+                const voiceStatus = document.querySelector('input[name="voiceStatus"]:checked');
+                
+                if (!voiceStatus) {
+                    e.preventDefault();
+                    alert('Please indicate whether you are mute by birth or lost your voice later in life.');
+                    return;
+                }
+                
+                if (voiceStatus.value === 'later') {
+                    const gender = document.querySelector('input[name="gender"]:checked');
+                    if (!gender) {
+                        e.preventDefault();
+                        alert('Please select your gender.');
+                        return;
+                    }
+                }
+            });
+        });
+    </script>
+    <!-- Features Section -->
+    <!-- <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fas fa-code feature-icon"></i>
+                        <h3>Backend Technologies</h3>
+                        <p>Powered by Django, our robust backend ensures seamless performance and reliable data processing for an optimal learning experience.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fas fa-brain feature-icon"></i>
+                        <h3>Machine Learning</h3>
+                        <p>Advanced ML algorithms analyze and interpret sign language gestures with high accuracy for effective learning and practice.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fas fa-laptop-code feature-icon"></i>
+                        <h3>Frontend Technologies</h3>
+                        <p>Modern, responsive interface built with the latest web technologies for an intuitive and engaging user experience.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Technologies Section -->
+    <!-- <section class="timeline-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Technologies We Use</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="timeline-item">
+                        <h4>Django & Python</h4>
+                        <p>Robust backend framework for secure and scalable web applications</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>OpenCV (CV2)</h4>
+                        <p>Advanced computer vision library for real-time image and video processing</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>NumPy & Matplotlib</h4>
+                        <p>Powerful libraries for numerical computing and data visualization</p>
+                    </div>
+                </div>
+            </div>
+            
+            {% comment %} <div class="text-center mt-5">
+                <h3 class="mb-4">Ready to start learning?</h3>
+                <form action="{% url 'hand_signal_detection' %}" method="post" enctype="application/x-www-form-urlencoded">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-custom">Try Hand Detection</button>
+                </form>
+                
+            </div> {% endcomment %}
+        </div>
+    </section> -->
+    <!-- Add this button somewhere in your template -->
+
+
+<!-- Audio Upload Modal -->
+<div class="modal fade" id="audioUploadModal" tabindex="-1" aria-labelledby="audioUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="audioUploadModalLabel">Upload Audio for Sign Language Conversion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'add_audio'  %}" method="post" enctype="multipart/form-data" id="audioUploadForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="audioFile" class="form-label">Select Audio File</label>
+                        <input type="file" class="form-control" id="audioFile" name="audio" accept="audio/*" required>
+                        <div class="form-text">Supported formats: MP3, WAV, M4A (Max size: 10MB)</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label class="form-label mb-0">Or Record Audio</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="toggleRecording">
+                                <i class="fas fa-microphone"></i> Start Recording
+                            </button>
+                        </div>
+                        <div id="recordingStatus" class="d-none">
+                            <div class="d-flex align-items-center mt-2">
+                                <div class="recording-indicator me-2"></div>
+                                <span id="recordingTime">00:00</span>
+                            </div>
+                        </div>
+                        <audio id="audioPreview" controls class="w-100 mt-2 d-none"></audio>
+                        <input type="hidden" id="recordedAudioBlob" name="recorded_audio">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this CSS to your home.css file or inline styles -->
+<style>
+    .recording-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: red;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.3; }
+        100% { opacity: 1; }
+    }
+</style>
+
+<!-- Add this JavaScript to handle audio recording -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleRecordingBtn = document.getElementById('toggleRecording');
+        const recordingStatus = document.getElementById('recordingStatus');
+        const recordingTime = document.getElementById('recordingTime');
+        const audioPreview = document.getElementById('audioPreview');
+        const recordedAudioInput = document.getElementById('recordedAudioBlob');
+        
+        let mediaRecorder;
+        let audioChunks = [];
+        let startTime;
+        let timerInterval;
+        let isRecording = false;
+        
+        toggleRecordingBtn.addEventListener('click', function() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        });
+        
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = e => {
+                        audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        audioPreview.src = audioUrl;
+                        audioPreview.classList.remove('d-none');
+                        
+                        // Convert Blob to Base64 for form submission
+                        const reader = new FileReader();
+                        reader.readAsDataURL(audioBlob);
+                        reader.onloadend = () => {
+                            recordedAudioInput.value = reader.result.split(',')[1]; // Remove the data URL prefix
+                        };
+                    };
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordingStatus.classList.remove('d-none');
+                    toggleRecordingBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Recording';
+                    
+                    // Start timer
+                    startTime = Date.now();
+                    timerInterval = setInterval(updateRecordingTime, 1000);
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    alert('Could not access microphone. Please check your browser permissions.');
+                });
+        }
+        
+        function stopRecording() {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            isRecording = false;
+            clearInterval(timerInterval);
+            toggleRecordingBtn.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
+        }
+        
+        function updateRecordingTime() {
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+            const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+            recordingTime.textContent = `${minutes}:${seconds}`;
+        }
+    });
+</script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h5>Sign Language</h5>
+                    <p>Empowering communication through technology</p>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'Home' %}" class="footer-link">Home</a></li>
+                        <li><a href="{% url 'text_to_sign' %}" class="footer-link">Text to Sign</a></li>
+                        <li><a href="{% url 'video' %}" class="footer-link">Find the Sign</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Contact</h5>
+                    <p>Phone: 4567-4555-102</p>
+                    <p>Email: info@signlanguage.com</p>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p class="mb-0">Copyright © 2024. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

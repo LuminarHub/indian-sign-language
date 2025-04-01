@@ -1,0 +1,194 @@
+{% extends "home.html" %}
+{% block home %}
+{% load static %}
+<style>
+    /* CSS styles */
+    #main {
+        margin-top: 100px;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 36px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        width: 300px;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    button[type="submit"] {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    p {
+        font-size: 24px;
+        color: #007bff;
+        margin-top: 20px;
+    }
+</style>
+
+<div id='main' style="margin-top:100px;">
+    
+ <h3  style="font-family: 'Times New Roman', Times, serif;text-align: left;padding: 30px;">Alphabets</h3>
+ <hr>
+ <div class="row mb-3" style="width: 100%;">
+    <div class="col">
+        <img src="{% static 'images/1.jpg' %}" alt="" height="400px" width="800px">
+        {% comment %} <div class="mt-1 btn btn-outline-info">A</div>
+        <img src="{% static 'images/ASL/k.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">K</div>
+        <img src="{% static 'images/ASL/U.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">U</div> {% endcomment %}
+    </div>
+    {% comment %} <div class="col">
+        <img src="{% static 'images/ASL/b.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">B</div>
+        <img src="{% static 'images/ASL/l.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">L</div>
+        <img src="{% static 'images/ASL/V.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">V</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/c.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">C</div>
+        <img src="{% static 'images/ASL/m.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">M</div>
+        <img src="{% static 'images/ASL/W.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">W</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/d.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">D</div>
+        <img src="{% static 'images/ASL/n.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">N</div>
+        <img src="{% static 'images/ASL/X.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">X</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/e.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">E</div>
+        <img src="{% static 'images/ASL/o.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">O</div>
+        <img src="{% static 'images/ASL/Y.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">Y</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/f.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">F</div>
+        <img src="{% static 'images/ASL/p.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">P</div>
+        <img src="{% static 'images/ASL/Z.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">Z</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/g.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">G</div>
+        <img src="{% static 'images/ASL/q.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">Q</div>
+    </div>
+    
+    <div class="col">
+        <img src="{% static 'images/ASL/h.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">H</div>
+        <img src="{% static 'images/ASL/r.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">R</div>
+    </div>
+    
+    <div class="col">
+        <img src="{% static 'images/ASL/i.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">I</div>
+        <img src="{% static 'images/ASL/S.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">S</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/j.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">J</div>
+        <img src="{% static 'images/ASL/t.jpeg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">T</div>
+    </div> {% endcomment %}
+
+    
+ </div>
+
+{% comment %} <hr>
+    <h3  style="font-family: 'Times New Roman', Times, serif;text-align: left;padding: 30px;">Numbers</h3>
+    <hr>
+ <div class="row mt-2" style="width: 100%;">
+    <div class="col">
+        <img src="{% static 'images/ASL/0.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">0</div>
+        <img src="{% static 'images/ASL/9.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">9</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/1.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">1</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/2.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">2</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/3.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">3</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/4.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">4</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/5.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">5</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/6.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">6</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/7.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">7</div>
+    </div>
+    <div class="col">
+        <img src="{% static 'images/ASL/8.jpg' %}" alt="" height="100px" width="100px">
+        <div class="mt-1 btn btn-outline-info">8</div>
+    </div>
+    <div class="col">
+        
+    </div> {% endcomment %}
+ {% comment %} </div> {% endcomment %}
+ 
+
+   
+
+</div>
+
+{% endblock home %}
+
+
+
+

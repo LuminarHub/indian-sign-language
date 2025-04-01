@@ -1,0 +1,334 @@
+{% extends "home.html" %}
+{% block home %}
+{% load static %}
+
+<style>
+    #main {
+        margin-top: 50px;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 36px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .btn-custom {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin: 10px;
+    }
+
+    .btn-custom:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-word {
+        background-color: #28a745;
+    }
+
+    .btn-word:hover {
+        background-color: #218838;
+    }
+
+    .btn-sentence {
+        background-color: #6c757d;
+    }
+
+    .btn-sentence:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-submit {
+        background-color: #dc3545;
+    }
+
+    .btn-submit:hover {
+        background-color: #c82333;
+    }
+
+    #camera-container {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    #camera-stream {
+        width: 100%;
+        height: auto;
+        max-width: 800px;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+    }
+
+    #predictions {
+        margin-top: 20px;
+        font-size: 20px;
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .control-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .button-group {
+        margin-top: 15px;
+        width: 100%;
+    }
+
+    .status-box {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 15px;
+        text-align: left;
+    }
+
+    .status-label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .status-value {
+        color: #007bff;
+    }
+</style>
+
+<script>
+    let speechSynthesisUtterance;
+    let isVideoRunning = false;
+
+    function startVoice() {
+        let resultText = document.getElementById('resultText').innerText;
+        if ('speechSynthesis' in window) {
+            speechSynthesisUtterance = new SpeechSynthesisUtterance(resultText);
+            speechSynthesisUtterance.lang = 'en-US';
+            window.speechSynthesis.speak(speechSynthesisUtterance);
+        } else {
+            alert('Text-to-speech is not supported in your browser.');
+        }
+    }
+
+    function stopVoice() {
+        if (speechSynthesisUtterance && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+    }
+
+    window.onbeforeunload = function() {
+        stopVoice();
+    };
+
+    function startVideo() {
+        const cameraContainer = document.getElementById('camera-container');
+        const cameraStream = document.getElementById('camera-stream');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const controlButtons = document.getElementById('control-buttons');
+
+        cameraContainer.style.display = 'block'; // Show the video stream
+        startButton.style.display = 'none'; // Hide the start button
+        stopButton.style.display = 'inline-block'; // Show the stop button
+        controlButtons.style.display = 'flex'; // Show control buttons
+        
+        isVideoRunning = true;
+
+        // Refresh the video stream
+        cameraStream.src = "{% url 'video_feed' %}" + "?timestamp=" + new Date().getTime();
+        
+        // Start polling for updates
+        startDataPolling();
+    }
+
+    function stopVideo() {
+        const cameraContainer = document.getElementById('camera-container');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const controlButtons = document.getElementById('control-buttons');
+
+        cameraContainer.style.display = 'none'; 
+        startButton.style.display = 'inline-block';
+        stopButton.style.display = 'none';
+        controlButtons.style.display = 'none';
+        
+        isVideoRunning = false;
+        stopVoice();
+        
+        // Stop polling for updates
+        stopDataPolling();
+    }
+    
+    let dataPollingInterval;
+    
+    function startDataPolling() {
+        // Poll for updates every 1 second
+        dataPollingInterval = setInterval(fetchLatestData, 1000);
+    }
+    
+    function stopDataPolling() {
+        if (dataPollingInterval) {
+            clearInterval(dataPollingInterval);
+        }
+    }
+    
+    function fetchLatestData() {
+        if (!isVideoRunning) return;
+        
+        fetch("{% url 'get_latest_data' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Error:", data.error);
+                    return;
+                }
+                
+                // Update the UI with the latest data
+                document.getElementById('resultText').innerText = data.word || "No word detected";
+                document.getElementById('sentenceText').innerText = data.sentence || "";
+                
+                // If there's a new audio file, update the audio player
+                if (data.audio_file) {
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.src = "{% static 'audio/' %}" + data.audio_file;
+                    audioPlayer.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+            });
+    }
+    
+    // Functions to send commands to the backend
+    function finalizeWord() {
+        if (!isVideoRunning) return;
+        fetch("{% url 'command' %}?action=space", { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Word finalized");
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+            });
+    }
+    
+    function finalizeSentence() {
+        if (!isVideoRunning) return;
+        fetch("{% url 'command' %}?action=period", { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Sentence finalized");
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+            });
+    }
+    
+    function submitDetection() {
+        if (!isVideoRunning) return;
+        fetch("{% url 'command' %}?action=submit", { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Detection submitted successfully!");
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+            });
+    }
+    
+    function removeLastLetter() {
+        if (!isVideoRunning) return;
+        fetch("{% url 'command' %}?action=backspace", { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Last letter removed");
+                } else {
+                    console.error("Error:", data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+            });
+    }
+</script>
+
+<div id='main'>
+    <section class="faq-section section-padding" id="section_4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-12 text-center">
+                    <h2 class="mb-4">Sign Language Detection</h2>
+                </div>
+
+                <div class="col-lg-12 col-12 text-center">
+                    <p>Start the camera to begin detecting sign language gestures</p>
+                    <button id="startButton" class="btn-custom" onclick="startVideo()">Start Camera</button>
+                    <button id="stopButton" class="btn-custom" onclick="stopVideo()" style="display:none;">Stop Camera</button>
+                </div>
+
+                <div id="camera-container" class="col-lg-12">
+                    <img id="camera-stream" src="{% url 'video_feed' %}" alt="Live Video Stream">
+                </div>
+
+                <div id="predictions" class="col-lg-12">
+                    <div class="status-box">
+                        
+                        {% comment %} <p><span class="status-label">Current Word:</span> <span id="resultText" class="status-value">{{ word|default:"No word detected" }}</span></p> {% endcomment %}
+                        <p><span class="status-label">Current Sentence:</span> <span id="sentenceText" class="status-value">{{ sentence|default:"" }}</span></p>
+                        <audio controls class="mt-2 " style="width:75%;" >
+                            <source src="{{ audio.audio_new.url }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio> 
+                    </div>
+                </div>
+
+                <div id="control-buttons" class="control-buttons" style="display: none;">
+                    <div class="button-group">
+                        <button class="btn-custom btn-word" onclick="finalizeWord()">Finalize Word (Space)</button>
+                        <button class="btn-custom btn-sentence" onclick="finalizeSentence()">Finalize Sentence (.)</button>
+                        <button class="btn-custom" onclick="removeLastLetter()">Remove Last Letter (b)</button>
+                        <button class="btn-custom" >Quit (q)</button>
+                    </div>
+                    <div class="button-group" hidden>
+                        <button class="btn-custom btn-submit" onclick="submitDetection()">Submit</button>
+                        <button class="btn-custom" onclick="startVoice()">🔊 Speak</button>
+                        <button class="btn-custom" onclick="stopVoice()">🔇 Stop</button>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 text-center mt-4">
+                    <audio id="audioPlayer" controls style="display: none;">
+                        <source src="" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% endblock home %}

@@ -1,0 +1,163 @@
+{% extends "home.html" %}
+{% block home %}
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<style>
+    /* Responsive and overflow-prevention styles */
+    #main {
+        max-width: 600px;
+        width: 90%;
+        margin: 100px auto 0;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-weight: 600;
+    }
+
+    .form-container {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        max-width: 400px;
+        padding: 12px 15px;
+        border: 2px solid #3498db;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+        outline: none;
+        border-color: #2980b9;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+    }
+
+    button[type="submit"] {
+        padding: 12px 25px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .sign-language-images {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 30px;
+        width: 100%;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .sign-language-images img {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .sign-language-images img:hover {
+        transform: scale(1.1);
+    }
+
+    /* Media Queries for Responsiveness */
+    @media (max-width: 600px) {
+        #main {
+            margin-top: 50px;
+            padding: 10px;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        input[type="text"], 
+        button[type="submit"] {
+            width: 100%;
+            max-width: none;
+        }
+
+        .sign-language-images {
+            gap: 10px;
+        }
+
+        .sign-language-images img {
+            max-width: 80px;
+            max-height: 80px;
+        }
+    }
+</style>
+
+<div id='main'>
+    <div class="form-container">
+        <h1>Text to Sign Language</h1>
+        <form id="myForm" action="{% url 'show_images' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" placeholder="Enter text to translate" name="text" required>
+            <button type="submit">Translate</button>
+        </form>
+    </div>
+</div>
+{% if images %}
+<div class="sign-language-images">
+    {% for image in images %}
+    <img src="data:image/png;base64,{{ image }}" alt="Sign Language Image for {{ input_text|slice:forloop.counter0 }}">
+    {% endfor %}
+</div>
+{% endif %}
+<script>
+    document.getElementById("myForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        var inputText = document.querySelector("input[name='text']").value.trim();
+        
+        // Check if input is not empty
+        if (inputText) {
+            speakInput(inputText);
+            this.submit();
+        } else {
+            alert("Please enter some text to translate.");
+        }
+    });
+
+    function speakInput(text) {
+        var speech = new SpeechSynthesisUtterance();
+        speech.text = text;
+        speechSynthesis.speak(speech);
+    }
+</script>
+{% endblock home %}
